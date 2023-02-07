@@ -29,6 +29,4 @@ Both the encipher and decipher fucntions currently overwrite the file that is gi
 
 Currently the `messageEncipher` and `messageDecipher` functions take a dictionary of all the book names you want to use for the enciphering. Eventually, I intend for this to be able to use multiple book sources at once, and this dictionary is planning for that
 
-I also intend to change the way that the character data is stored in the JSON files to make the files much smaller. Smaller files would allow for the multiple PDF sources to be used with less memory. Right now the individual data for each character is in a dictionary. I plan to convert to using tuples, which should help quite a bit, but a lot needs to be changed internally to make that happen
-
 I might also make it so that the file is not overwritten so that you can have a copy of what you encoded if need be
