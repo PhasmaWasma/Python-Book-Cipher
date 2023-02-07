@@ -63,11 +63,8 @@ def pageSort(page: int) -> dict:
         line_string = line.strip()
         for i in range(len(line_string)):
             char = line_string[i]
-            char_info = {
-            "page": page,
-            "line": line_num,
-            "char": i   }
-
+            char_info = [page, line_num, i] #creates the list of the page, line, and character in line for each character
+                                            #would use a tuple here, but the JSON format will convert it to a list anyway
             if char in page_info:
                 page_info[char].append(char_info)
             elif char == "“" or char == "”" or char == '"':
@@ -151,8 +148,12 @@ def bookCharData(pdf_name: str) -> None:
 ################################################################################
 def main():
     # just put the name of whatever pdf you want to scrape here
-    pdf_name = ""
+    pdf_name = "From_Chaos_To_Creativity.pdf"
     bookCharData(pdf_name)
+
+    #using lists instead of dictionaries reduces the JSON filesize by ~66%
+    #would sorting the output dictionary so that the largest lists of chars (i.e. most frequent letters in the
+    #language of the book) get searched through first when being encoded/decoded?
 
 if __name__ == "__main__":
     main()

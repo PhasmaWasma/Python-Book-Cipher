@@ -15,7 +15,8 @@ def stringSeparate(string: str) -> "list[str]":
     quanta_length = 10
     for i in range(0, len(string), quanta_length):
         quanta = string[i:i + quanta_length]
-        quanta_list += [quanta]
+        #quanta_list += [quanta]
+        quanta_list.append(quanta)
 
     return quanta_list
 
@@ -133,7 +134,7 @@ def quantaDataSort(quantum: str, dataset: str) -> str:
     data_chunk = ""
 
     for i in range(len(dataset)):
-        data_list += [dataset[i]]
+        data_list.append(dataset[i])
 
     for n in range(len(quantum)):
         if quantum[n] in data_list:
@@ -155,13 +156,9 @@ def quantaSort(quanta: str, data_dict: dict) -> "dict[str]":
     line = quantaDataSort(quanta, data_dict["line"])
     char = quantaDataSort(quanta, data_dict["char"])
 
-    quantum_dict = {
-    "book": book,
-    "page": page,
-    "line": line,
-    "char": char
-    }
-    return quantum_dict
+    quantum_list = [book, page, line, char]
+    
+    return quantum_list
 
 def dataSort(quanta_list: "list[str]", data_dict: dict) -> "list[str]":
     '''
@@ -220,26 +217,27 @@ def sortCodedMessage(filename: str, data_dict: dict) -> "list[list[dict]]":
 
     return message_list
 
-def charDecipher(char_dict: dict, code_key: "dict{dict}") -> dict:
+def charDecipher(char_list: list, code_key: "dict{dict}") -> dict:
     '''
     Uses the code key to take the coded character data and convert it back into integers
     representing the positional locations for the character.
     Parameters:
-        char_dict: the coded character dict that has been sorted into its data types
+        char_list: the coded character list that has been sorted into its data types
         code_key: a dictionary containing the key to decode each data type
     Returns:
-        new_char: the dictionary representing where the character is in its book
+        new_char: the list representing where the character is in its book
     '''
-    new_char = {}
-    for dict_key in char_dict:
-        data = char_dict[dict_key]
+    new_char = []
+    all_types = ["book", "page", "line", "char"]
+    for data_type in range(len(char_list)):
+        data = char_list[data_type]
         new_dict_entry = ""
 
         for char in data:
-            letter = str(code_key[dict_key][char])
+            letter = str(code_key[all_types[data_type]][char])
             new_dict_entry += letter
 
-        new_char[dict_key] = int(new_dict_entry)
+        new_char.append(int(new_dict_entry))
 
     return new_char
 
@@ -258,26 +256,26 @@ def listLengthChecker(list_to_test: list) -> int:
 
     return list_length
 
-def binarySearchChecker(to_find: dict, sample_dict : dict) -> str:
+def binarySearchChecker(to_find: list, sample_list : list) -> str:
     '''
     Helper fuction that checks to see if the sampling locations value is the same as what it's looking for.
     If the value is the same, it will return "0". If the value it's looking for is
     greater than the value found, it will return "+". If the value is lower than
     it's looking for, it will return "-".
     Parameters:
-        to_find: the character dictionary that it is trying to find
-        sample_dict: the test dictionary it is comparing
+        to_find: the character list that it is trying to find
+        sample_dict: the test list it is comparing
     Returns:
         a string that signifies if the two are the same or which direction it needs to look
-        to find the dictionary
+        to find to_find
     '''
-    find_page = to_find["page"]
-    find_line = to_find["line"]
-    find_char = to_find["char"]
+    find_page = to_find[0]  #the page
+    find_line = to_find[1]  #the line
+    find_char = to_find[2]  #the char
 
-    sample_page = sample_dict["page"]
-    sample_line = sample_dict["line"]
-    sample_char = sample_dict["char"]
+    sample_page = sample_list[0]
+    sample_line = sample_list[1]
+    sample_char = sample_list[2]
 
     page = ""
     line = ""
@@ -306,15 +304,15 @@ def binarySearchChecker(to_find: dict, sample_dict : dict) -> str:
 
     return char
 
-def binarySearch(to_find: 'dict', looking_in: 'list[dict]') -> "dict | None":
+def binarySearch(to_find: 'list', looking_in: 'list[list]') -> "list | None":
     '''
-    Looks for the given dictionary in the given list of dictionaries by using
+    Looks for the given list in the given list of lists by using
     a binary search. If in the list, it returns the item. If not, it returns None
     Parameters:
-        to_find: the dictionary to find
-        looking_in: a list of dictionaries
+        to_find: the list to find
+        looking_in: a list of character info lists
     Returns:
-        None if not in the list; the given dictionary if in the list
+        None if not in the list; the given list if in the list
     '''
 
     list_length = listLengthChecker(looking_in)
@@ -323,11 +321,11 @@ def binarySearch(to_find: 'dict', looking_in: 'list[dict]') -> "dict | None":
         if len(looking_in) != list_length:
             list_length -= 1
         sample_location = int(list_length / 2)
-        sample_dict = looking_in[sample_location]
+        sample_list = looking_in[sample_location]
 
-        comparison_result = binarySearchChecker(to_find, sample_dict)
+        comparison_result = binarySearchChecker(to_find, sample_list)
         if comparison_result == "0":
-            return sample_dict
+            return sample_list
         elif comparison_result == "+":
             looking_in = looking_in[(sample_location + 1)::]
             list_length = len(looking_in)
@@ -337,50 +335,50 @@ def binarySearch(to_find: 'dict', looking_in: 'list[dict]') -> "dict | None":
 
     if len(looking_in) == 0:
         return None
-    sample_dict = looking_in[0]
-    comparison_result = binarySearchChecker(to_find, sample_dict)
+    sample_list = looking_in[0]
+    comparison_result = binarySearchChecker(to_find, sample_list)
     if comparison_result == "0":
-        return sample_dict
+        return sample_list
     else:
         return None
 
-def jsonFinderDecode(char_dict: dict, book_data: dict) -> int:
+def jsonFinderDecode(char_list: dict, book_data: dict) -> int:
     '''
     Checks each character list in the dictionary until it finds the character associated
     with the given character data
     Parameters:
-        char_dict: the character dictionary to look for
+        char_dict: the character list to look for
         book_data: the dictionary of all the character data for the given book
     Returns:
-        the character string that is the key for the dictionary with the given dictionary
+        the character string that is the key for the dictionary with the given data info
         None if it cannot be found in the book
     '''
     for i in book_data:
-        is_in = binarySearch(char_dict, book_data[i])
+        is_in = binarySearch(char_list, book_data[i])
         if is_in != None:
             return i
 
     return None
 
-def charDecode(char_dict: dict, code_key: dict, book_data: dict) ->  str:
+def charDecode(char_list: dict, code_key: dict, book_data: dict) ->  str:
     '''
-    Removes the book data in the character dictionary and looks inside of that
+    Removes the book data in the characterlist and looks inside of that
     books dictionary to find the character associated with the given character dictionary
     Parameters:
-        char_dict: a dictionary containing the location and book data for the character
+        char_list: a list containing the location and book data for the character
         code_key: a dictionary containing the key to decode each data type
         book_data: the dictionary of all the character data in the book its looking in
     Returns:
         a string of the character it found or None if it could not be found
     '''
-    book_id = char_dict.pop("book")
-    char_dict.update()
+    book_id = char_list[0]
+    char_list = char_list[1::]
     #book_title = code_key["book"][book_id]
 
-    key = jsonFinderDecode(char_dict, book_data)
+    key = jsonFinderDecode(char_list, book_data)
     return key
 
-def decodeMessage(message_char_data: "list[list[dict]]", code_key: "dict{dict}", book_title: str) -> list:
+def decodeMessage(message_char_data: "list[list[list]]", code_key: "dict{dict}", book_title: str) -> list:
     '''
     Decodes the given lists of character data into the characters they represent and
     gives back the list with the character dictionaries replaced with their strings
@@ -397,9 +395,9 @@ def decodeMessage(message_char_data: "list[list[dict]]", code_key: "dict{dict}",
 
         for line in range(len(message_char_data)):
             for char in range(len(message_char_data[line])):
-                char_dict = message_char_data[line][char]
-                char_dict = charDecipher(char_dict, code_key)
-                new_letter = charDecode(char_dict, code_key, book_data)
+                char_list = message_char_data[line][char]
+                char_list = charDecipher(char_list, code_key)
+                new_letter = charDecode(char_list, code_key, book_data)
                 message_char_data[line][char] = new_letter
         read_file.close()
 
@@ -433,29 +431,34 @@ def sortOutgoingMessage(filename: str) -> "list[list[str]]":
 
 def jsonFinderEncode(char: str, book_data: dict) -> dict:
     '''
-    Takes the given character and book dictionary and randomly picks a dictionary
+    Takes the given character and book dictionary and randomly picks a char data list
     from it to use for the character. If there is an error with single parentheses,
     it converts it into the type found in pdfs to see if that will work instead.
     Parameters:
         char: a string of a character
-        book_data: a dictionary of lists of dictionaries of each character in the book
+        book_data: a dictionary of lists of lists of each character in the book
     Returns:
         a dictionary of the character location data
     '''
-    try:
-        char_options = book_data[char]
-        index = secrets.randbelow(len(char_options))
-        char_dict = char_options[index]
-        char_dict.update({"book": 1})
+    char_options = book_data[char]
+    index = secrets.randbelow(len(char_options))
+    char_list = char_options[index]
+    new_char_list = [1]    #sets the book value as 1 for now
+    for i in range(len(char_list)):
+        new_char_list.append(char_list[i])
+    '''
     except:
-        if   char == "'":
-             char = '’'
-             char_options = book_data[char]
-             index = secrets.randbelow(len(char_options))
-             char_dict = char_options[index]
-             char_dict.update({"book": 1})
+        if  char == "'":
+            char = '’'
+            char_options = book_data[char]
+            index = secrets.randbelow(len(char_options))
+            char_list = char_options[index]
+            new_char_list = [1]    #sets the book value as 1 for now
+            for i in range(char_list):
+                new_char_list.append(char_list[i])
+    '''
 
-    return char_dict
+    return new_char_list
 
 def keyFlipper(code_key: dict) -> "dict{list}":
     '''
@@ -481,7 +484,7 @@ def keyFlipper(code_key: dict) -> "dict{list}":
 
     return reversed_dict
 
-def charDictEncoder(char_dict: dict, reversed_code_key: "dict{dict}") -> "list[list[str]]":
+def charDictEncoder(char_list: list, reversed_code_key: "dict{dict}") -> "list[list[str]]":
     '''
     Takes a character dictionary and encodes the location data using the cipher,
     then returns it as a list. Does not include the directional component yet
@@ -492,30 +495,30 @@ def charDictEncoder(char_dict: dict, reversed_code_key: "dict{dict}") -> "list[l
     Returns:
         a list of all the ciphertext characters, which are in their own lists
     '''
-    #need to give the char dict a book value when extracting it from a book before putting it here
+    #need to give the char list a book value when extracting it from a book before putting it here
     #needs to NOT have the directional components yet as well
     encoded_list = []
-    for i in char_dict:
-        data_location = str(char_dict[i])
+    for i in range(len(char_list)):
+        data_location = str(char_list[i])
 
-        if i == "page" and len(data_location) == 2:
+        if i == 1 and len(data_location) == 2:
             data_location = "0" + data_location
-        elif i == "page" and len(data_location) == 1:
+        elif i == 1 and len(data_location) == 1:
             data_location = "00" + data_location
 
-        if i == "line" and len(data_location) == 1:
+        if i == 2 and len(data_location) == 1:
             data_location = "0" + data_location
 
-        if i == "char" and len(data_location) == 2:
+        if i == 3 and len(data_location) == 2:
             data_location = "0" + data_location
-        elif i == "char" and len(data_location) == 1:
+        elif i == 3 and len(data_location) == 1:
             data_location = "00" + data_location
 
-
+        all_types = ["book", "page", "line", "char"]
         data_list = []
         for n in range(0, len(data_location)):
             location_num = int(data_location[n])
-            new_num_str  = secrets.choice(reversed_code_key[i][location_num])
+            new_num_str  = secrets.choice(reversed_code_key[all_types[i]][location_num])
             data_list.append(new_num_str)
 
         encoded_list.append(data_list)
@@ -524,7 +527,7 @@ def charDictEncoder(char_dict: dict, reversed_code_key: "dict{dict}") -> "list[l
 
 def charEncipher(encoded_list: "list[list[str]]", data_dict: "dict{str | list}") -> str:
     '''
-    Takes the character location data list and adds a directional component, ranndomly
+    Takes the character location data list and adds a directional component, randomly
     deciding whether to reverse the direction or not. Then it takes the list and
     converts it into a single string quantum.
     Parameters:
@@ -736,7 +739,7 @@ def main():
 
     string_of_chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZαβγδεζηθικλμνξοπρςστυφχψω#$%&!?"
     # This is all of the characters that will be used for the code. It should work
-    # with any unicode characters. Just make sure that the total max parameters do
+    # with any unicode characters you would like to use. Just make sure that the total max parameters do
     # not exceed the length of the string
 
     key_params = {
@@ -749,16 +752,18 @@ def main():
     }
     # These are the parameters used when generating a new key for the code
     # It will randomly pick a value to use for each category between the max
-    # and min values (inclusive). left_to_right determines how many of the direction
-    # characters represent reading it left to right. Should be lower than the total
-    # number of direction characters
+    # and min values (inclusive). For page, line, and char I would reccomend your
+    # minimum be greater than 10.
+    # left_to_right determines how many of the direction characters represent
+    # reading it left to right. Should be lower than the total number of direction characters
 
     #keyGenerator(key_name, string_of_chars, key_params)
     # Only need to use the key generator function when you want to create a new key
 
     ############################################################################
 
-    books_dict = {1: ""} #only uses the first book here for now (no file ending, just the name of the file)
+    my_book = "From_Chaos_To_Creativity"
+    books_dict = {1: my_book} #only uses the first book here for now (no file ending, just the name)
     code_key = "code_key.json"
 
     with open(f"{code_key}", "r") as read_file:
@@ -768,8 +773,6 @@ def main():
 
     #messageEncipher("secret_message.txt", code_key, books_dict)
     #messageDecipher("secret_message.txt", code_key, books_dict)
-
-    #read_file.close()
 
 
 if __name__ == "__main__":
